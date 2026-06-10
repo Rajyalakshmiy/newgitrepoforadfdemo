@@ -1,0 +1,33 @@
+{
+	"name": "AzureSqlDatabase_src",
+	"properties": {
+		"parameters": {
+			"sqlservername": {
+				"type": "string",
+				"defaultValue": "sql-demo-adf.database.windows.net"
+			},
+			"sqldbname": {
+				"type": "string",
+				"defaultValue": "Demo_SourceDB"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "@{linkedService().sqlservername}",
+			"database": "@{linkedService().sqldbname}",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "sqladmin",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AKV_src",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "SqlConnectionStringsrc"
+			}
+		}
+	}
+}
