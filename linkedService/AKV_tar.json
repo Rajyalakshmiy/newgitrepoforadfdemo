@@ -1,0 +1,10 @@
+{
+	"name": "AKV_tar",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://sql-username-tar.vault.azure.net/"
+		}
+	}
+}
