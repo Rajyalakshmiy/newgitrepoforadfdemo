@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-infosys-demo-dev"
+		},
+		"AKV_src_properties_typeProperties_baseUrl": {
+			"value": "https://sql-username.vault.azure.net/"
+		},
+		"AKV_tar_properties_typeProperties_baseUrl": {
+			"value": "https://sql-username-tar.vault.azure.net/"
+		},
+		"AzureSqlDatabase_src_properties_typeProperties_server": {
+			"value": "@{linkedService().sqlservername}"
+		},
+		"AzureSqlDatabase_src_properties_typeProperties_database": {
+			"value": "@{linkedService().sqldbname}"
+		},
+		"AzureSqlDatabase_src_properties_typeProperties_userName": {
+			"value": "sqladmin"
+		},
+		"AzureSqlDatabase_tar_properties_typeProperties_server": {
+			"value": "@{linkedService().sqlservername}"
+		},
+		"AzureSqlDatabase_tar_properties_typeProperties_database": {
+			"value": "@{linkedService().sqldbname}"
+		},
+		"AzureSqlDatabase_tar_properties_typeProperties_userName": {
+			"value": "sqladmin"
+		}
+	}
+}
