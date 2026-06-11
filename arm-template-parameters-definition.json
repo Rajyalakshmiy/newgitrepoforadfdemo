@@ -1,0 +1,50 @@
+{
+  "Microsoft.DataFactory/factories/linkedServices": {
+    "properties": {
+      "typeProperties": {
+        "baseUrl": "=",
+        "server": "=",
+        "database": "=",
+        "userName": "=",
+        "password": {
+          "secretName": "="
+        }
+      },
+      "parameters": {
+        "*": {
+          "defaultValue": "="
+        }
+      }
+    }
+  },
+  "Microsoft.DataFactory/factories/datasets": {
+    "properties": {
+      "parameters": {
+        "*": {
+          "defaultValue": "="
+        }
+      },
+      "typeProperties": {
+        "*": "="
+      }
+    }
+  },
+  "Microsoft.DataFactory/factories/pipelines": {
+    "properties": {
+      "parameters": {
+        "*": {
+          "defaultValue": "="
+        }
+      }
+    }
+  },
+  "Microsoft.DataFactory/factories/triggers": {
+    "properties": {
+      "typeProperties": {
+        "recurrence": {
+          "*": "="
+        }
+      }
+    }
+  }
+}
