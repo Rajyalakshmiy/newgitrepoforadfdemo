@@ -7,37 +7,21 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-infosys-demo-dev"
 		},
-		"AKV_src_properties_typeProperties_baseUrl": {
+		"trigger1_properties_typeProperties_recurrence_frequency": {
 			"type": "string",
-			"defaultValue": "https://sql-username.vault.azure.net/"
+			"defaultValue": "Day"
 		},
-		"AKV_tar_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://sql-username-tar.vault.azure.net/"
+		"trigger1_properties_typeProperties_recurrence_interval": {
+			"type": "int",
+			"defaultValue": 5
 		},
-		"AzureSqlDatabase_src_properties_typeProperties_server": {
+		"trigger1_properties_typeProperties_recurrence_startTime": {
 			"type": "string",
-			"defaultValue": "@{linkedService().sqlservername}"
+			"defaultValue": "2026-06-11T14:22:00"
 		},
-		"AzureSqlDatabase_src_properties_typeProperties_database": {
+		"trigger1_properties_typeProperties_recurrence_timeZone": {
 			"type": "string",
-			"defaultValue": "@{linkedService().sqldbname}"
-		},
-		"AzureSqlDatabase_src_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "sqladmin"
-		},
-		"AzureSqlDatabase_tar_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "@{linkedService().sqlservername}"
-		},
-		"AzureSqlDatabase_tar_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "@{linkedService().sqldbname}"
-		},
-		"AzureSqlDatabase_tar_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "sqladmin"
+			"defaultValue": "India Standard Time"
 		},
 		"containerUri": {
 			"type": "string",
@@ -66,29 +50,17 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"AKV_src_properties_typeProperties_baseUrl": {
-						"value": "[parameters('AKV_src_properties_typeProperties_baseUrl')]"
+					"trigger1_properties_typeProperties_recurrence_frequency": {
+						"value": "[parameters('trigger1_properties_typeProperties_recurrence_frequency')]"
 					},
-					"AKV_tar_properties_typeProperties_baseUrl": {
-						"value": "[parameters('AKV_tar_properties_typeProperties_baseUrl')]"
+					"trigger1_properties_typeProperties_recurrence_interval": {
+						"value": "[parameters('trigger1_properties_typeProperties_recurrence_interval')]"
 					},
-					"AzureSqlDatabase_src_properties_typeProperties_server": {
-						"value": "[parameters('AzureSqlDatabase_src_properties_typeProperties_server')]"
+					"trigger1_properties_typeProperties_recurrence_startTime": {
+						"value": "[parameters('trigger1_properties_typeProperties_recurrence_startTime')]"
 					},
-					"AzureSqlDatabase_src_properties_typeProperties_database": {
-						"value": "[parameters('AzureSqlDatabase_src_properties_typeProperties_database')]"
-					},
-					"AzureSqlDatabase_src_properties_typeProperties_userName": {
-						"value": "[parameters('AzureSqlDatabase_src_properties_typeProperties_userName')]"
-					},
-					"AzureSqlDatabase_tar_properties_typeProperties_server": {
-						"value": "[parameters('AzureSqlDatabase_tar_properties_typeProperties_server')]"
-					},
-					"AzureSqlDatabase_tar_properties_typeProperties_database": {
-						"value": "[parameters('AzureSqlDatabase_tar_properties_typeProperties_database')]"
-					},
-					"AzureSqlDatabase_tar_properties_typeProperties_userName": {
-						"value": "[parameters('AzureSqlDatabase_tar_properties_typeProperties_userName')]"
+					"trigger1_properties_typeProperties_recurrence_timeZone": {
+						"value": "[parameters('trigger1_properties_typeProperties_recurrence_timeZone')]"
 					}
 				}
 			},

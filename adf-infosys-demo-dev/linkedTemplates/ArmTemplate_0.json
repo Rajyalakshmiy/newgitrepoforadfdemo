@@ -7,37 +7,21 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-infosys-demo-dev"
 		},
-		"AKV_src_properties_typeProperties_baseUrl": {
+		"trigger1_properties_typeProperties_recurrence_frequency": {
 			"type": "string",
-			"defaultValue": "https://sql-username.vault.azure.net/"
+			"defaultValue": "Day"
 		},
-		"AKV_tar_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://sql-username-tar.vault.azure.net/"
+		"trigger1_properties_typeProperties_recurrence_interval": {
+			"type": "int",
+			"defaultValue": 5
 		},
-		"AzureSqlDatabase_src_properties_typeProperties_server": {
+		"trigger1_properties_typeProperties_recurrence_startTime": {
 			"type": "string",
-			"defaultValue": "@{linkedService().sqlservername}"
+			"defaultValue": "2026-06-11T14:22:00"
 		},
-		"AzureSqlDatabase_src_properties_typeProperties_database": {
+		"trigger1_properties_typeProperties_recurrence_timeZone": {
 			"type": "string",
-			"defaultValue": "@{linkedService().sqldbname}"
-		},
-		"AzureSqlDatabase_src_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "sqladmin"
-		},
-		"AzureSqlDatabase_tar_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "@{linkedService().sqlservername}"
-		},
-		"AzureSqlDatabase_tar_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "@{linkedService().sqldbname}"
-		},
-		"AzureSqlDatabase_tar_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "sqladmin"
+			"defaultValue": "India Standard Time"
 		}
 	},
 	"variables": {
@@ -52,7 +36,7 @@
 				"annotations": [],
 				"type": "AzureKeyVault",
 				"typeProperties": {
-					"baseUrl": "[parameters('AKV_src_properties_typeProperties_baseUrl')]"
+					"baseUrl": "https://sql-username.vault.azure.net/"
 				}
 			},
 			"dependsOn": []
@@ -65,7 +49,7 @@
 				"annotations": [],
 				"type": "AzureKeyVault",
 				"typeProperties": {
-					"baseUrl": "[parameters('AKV_tar_properties_typeProperties_baseUrl')]"
+					"baseUrl": "https://sql-username-tar.vault.azure.net/"
 				}
 			},
 			"dependsOn": []
@@ -88,12 +72,12 @@
 				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"server": "[parameters('AzureSqlDatabase_src_properties_typeProperties_server')]",
-					"database": "[parameters('AzureSqlDatabase_src_properties_typeProperties_database')]",
+					"server": "@{linkedService().sqlservername}",
+					"database": "@{linkedService().sqldbname}",
 					"encrypt": "mandatory",
 					"trustServerCertificate": false,
 					"authenticationType": "SQL",
-					"userName": "[parameters('AzureSqlDatabase_src_properties_typeProperties_userName')]",
+					"userName": "sqladmin",
 					"password": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
@@ -126,12 +110,12 @@
 				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"server": "[parameters('AzureSqlDatabase_tar_properties_typeProperties_server')]",
-					"database": "[parameters('AzureSqlDatabase_tar_properties_typeProperties_database')]",
+					"server": "@{linkedService().sqlservername}",
+					"database": "@{linkedService().sqldbname}",
 					"encrypt": "mandatory",
 					"trustServerCertificate": false,
 					"authenticationType": "SQL",
-					"userName": "[parameters('AzureSqlDatabase_tar_properties_typeProperties_userName')]",
+					"userName": "sqladmin",
 					"password": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
@@ -251,6 +235,14 @@
 						"sqldbname": "Demo_TargetDB"
 					}
 				},
+				"parameters": {
+					"tablename": {
+						"type": "string"
+					},
+					"schemaname": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [
@@ -276,8 +268,14 @@
 					}
 				],
 				"typeProperties": {
-					"schema": "dbo",
-					"table": "Employees"
+					"schema": {
+						"value": "@dataset().schemaname",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().tablename",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
@@ -350,11 +348,16 @@
 									"typeProperties": {
 										"source": {
 											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "SELECT *\nFROM @{item().SourceTable}\nWHERE @{item().WatermarkColumn} > '@{item().LastWatermarkValue}'",
+												"type": "Expression"
+											},
 											"queryTimeout": "02:00:00",
 											"partitionOption": "None"
 										},
 										"sink": {
 											"type": "AzureSqlSink",
+											"preCopyScript": "TRUNCATE TABLE dbo.Stg_Employees;",
 											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
@@ -380,9 +383,129 @@
 										{
 											"referenceName": "AzureSqlTable_tar",
 											"type": "DatasetReference",
-											"parameters": {}
+											"parameters": {
+												"tablename": {
+													"value": "@concat('stg_',item().TargetTable)",
+													"type": "Expression"
+												},
+												"schemaname": "dbo"
+											}
 										}
 									]
+								},
+								{
+									"name": "Stored procedure1",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Copy data1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_Merge_Employees]"
+									},
+									"linkedServiceName": {
+										"referenceName": "AzureSqlDatabase_tar",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"sqlservername": "sql-demo-adf.database.windows.net",
+											"sqldbname": "Demo_TargetDB"
+										}
+									}
+								},
+								{
+									"name": "Lkpwatermark",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "Stored procedure1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "\nSELECT MAX(LastModified) AS MaxWatermark\nFROM Stg_Employees;\n",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "AzureSqlTable_tar",
+											"type": "DatasetReference",
+											"parameters": {
+												"tablename": "Stg_Employees",
+												"schemaname": "dbo"
+											}
+										}
+									}
+								},
+								{
+									"name": "Stored procedure2",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Lkpwatermark",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_UpdateWatermark]",
+										"storedProcedureParameters": {
+											"NewWatermark": {
+												"value": {
+													"value": "@activity('Lkpwatermark').output.firstRow.MaxWatermark\n\n",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"TableName": {
+												"value": {
+													"value": "@item().SourceTable",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "AzureSqlDatabase_src",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"sqlservername": "sql-demo-adf.database.windows.net",
+											"sqldbname": "Demo_SourceDB"
+										}
+									}
 								}
 							]
 						}
@@ -399,7 +522,39 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable_metadata')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable_src')]",
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable_tar')]"
+				"[concat(variables('factoryId'), '/datasets/AzureSqlTable_tar')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase_tar')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase_src')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_load_data_demo",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "[parameters('trigger1_properties_typeProperties_recurrence_frequency')]",
+						"interval": "[parameters('trigger1_properties_typeProperties_recurrence_interval')]",
+						"startTime": "[parameters('trigger1_properties_typeProperties_recurrence_startTime')]",
+						"timeZone": "[parameters('trigger1_properties_typeProperties_recurrence_timeZone')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_load_data_demo')]"
 			]
 		}
 	]

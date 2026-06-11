@@ -5,29 +5,17 @@
 		"factoryName": {
 			"value": "adf-infosys-demo-dev"
 		},
-		"AKV_src_properties_typeProperties_baseUrl": {
-			"value": "https://sql-username.vault.azure.net/"
+		"trigger1_properties_typeProperties_recurrence_frequency": {
+			"value": "Day"
 		},
-		"AKV_tar_properties_typeProperties_baseUrl": {
-			"value": "https://sql-username-tar.vault.azure.net/"
+		"trigger1_properties_typeProperties_recurrence_interval": {
+			"value": 5
 		},
-		"AzureSqlDatabase_src_properties_typeProperties_server": {
-			"value": "@{linkedService().sqlservername}"
+		"trigger1_properties_typeProperties_recurrence_startTime": {
+			"value": "2026-06-11T14:22:00"
 		},
-		"AzureSqlDatabase_src_properties_typeProperties_database": {
-			"value": "@{linkedService().sqldbname}"
-		},
-		"AzureSqlDatabase_src_properties_typeProperties_userName": {
-			"value": "sqladmin"
-		},
-		"AzureSqlDatabase_tar_properties_typeProperties_server": {
-			"value": "@{linkedService().sqlservername}"
-		},
-		"AzureSqlDatabase_tar_properties_typeProperties_database": {
-			"value": "@{linkedService().sqldbname}"
-		},
-		"AzureSqlDatabase_tar_properties_typeProperties_userName": {
-			"value": "sqladmin"
+		"trigger1_properties_typeProperties_recurrence_timeZone": {
+			"value": "India Standard Time"
 		}
 	}
 }
