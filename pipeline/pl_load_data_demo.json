@@ -91,9 +91,130 @@
 							"outputs": [
 								{
 									"referenceName": "AzureSqlTable_tar",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"tablename": {
+											"value": "@concat('stg_',item().TargetTable)",
+											"type": "Expression"
+										},
+										"schemaname": "dbo"
+									}
 								}
 							]
+						},
+						{
+							"name": "Stored procedure1",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[usp_Merge_Employees]"
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase_tar",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"sqlservername": "sql-demo-adf.database.windows.net",
+									"sqldbname": "Demo_TargetDB"
+								}
+							}
+						},
+						{
+							"name": "Lkpwatermark",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Stored procedure1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "\nSELECT MAX(LastModified) AS MaxWatermark\nFROM Stg_Employees;\n",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "AzureSqlTable_tar",
+									"type": "DatasetReference",
+									"parameters": {
+										"tablename": "Stg_Employees",
+										"schemaname": "dbo"
+									}
+								}
+							}
+						},
+						{
+							"name": "Stored procedure2",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Lkpwatermark",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[usp_UpdateWatermark]",
+								"storedProcedureParameters": {
+									"NewWatermark": {
+										"value": {
+											"value": "@activity('Lkpwatermark').output.value",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"TableName": {
+										"value": {
+											"value": "@item().SourceTable",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase_src",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"sqlservername": "sql-demo-adf.database.windows.net",
+									"sqldbname": "Demo_SourceDB"
+								}
+							}
 						}
 					]
 				}
