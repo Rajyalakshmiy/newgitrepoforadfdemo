@@ -9,6 +9,14 @@
 				"sqldbname": "Demo_TargetDB"
 			}
 		},
+		"parameters": {
+			"tablename": {
+				"type": "string"
+			},
+			"schemaname": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [
@@ -34,8 +42,14 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "dbo",
-			"table": "Employees"
+			"schema": {
+				"value": "@dataset().schemaname",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().tablename",
+				"type": "Expression"
+			}
 		}
 	}
 }

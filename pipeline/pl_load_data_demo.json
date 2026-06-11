@@ -61,11 +61,13 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
+									"sqlReaderQuery": "SELECT *\nFROM @{item().SourceTable}\nWHERE @{item().WatermarkColumn} > '@{item().LastWatermarkValue}'",
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
 								"sink": {
 									"type": "AzureSqlSink",
+									"preCopyScript": "TRUNCATE TABLE dbo.Stg_Employees;",
 									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false,
 									"disableMetricsCollection": false
