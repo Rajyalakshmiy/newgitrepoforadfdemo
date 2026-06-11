@@ -193,7 +193,7 @@
 								"storedProcedureParameters": {
 									"NewWatermark": {
 										"value": {
-											"value": "@activity('Lkpwatermark').output.value",
+											"value": "@activity('Lkpwatermark').output.firstRow.MaxWatermark\n\n",
 											"type": "Expression"
 										},
 										"type": "DateTime"
