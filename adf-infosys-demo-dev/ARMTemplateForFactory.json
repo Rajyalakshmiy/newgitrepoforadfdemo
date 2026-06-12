@@ -137,7 +137,10 @@
 													"value": "@concat('stg_',item().TargetTable)",
 													"type": "Expression"
 												},
-												"schemaname": "dbo"
+												"schemaname": {
+													"value": "@item().TargetSchema",
+													"type": "Expression"
+												}
 											}
 										}
 									]
